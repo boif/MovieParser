@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+import os
+from urllib.parse import urljoin
 
 url = 'https://www.film.ru/online'
 
@@ -30,12 +32,29 @@ def parse_movie_details(movie_url):
         '.block_table:-soup-contains("режиссер") + div a') else 'Нет данных'
     description = soup.select_one('.wrapper_movies_text').get_text(strip = True)
 
+    poster_tag = soup.select_one('.wrapper_block_stack.wrapper_movies_poster')
+    poster_url = urljoin(movie_url, poster_tag['data-src']) if poster_tag and 'data-src' in poster_tag.attrs else None
+
+    poster_path = None
+    if poster_url:
+        poster_response = requests.get(poster_url)
+        poster_response.raise_for_status()
+
+        os.makedirs('media/movies/posters', exist_ok = True)
+
+        poster_name = f"{title.replace(' ', '_').replace('/', '-')}.jpg"  # Форматирование имени файла
+        poster_path = os.path.join('media/movies/posters', poster_name)  # Изменено на 'posters'
+
+        with open(poster_path, 'wb') as f:
+            f.write(poster_response.content)
+
     return {
         'title': title,
         'year': year,
         'rating_imdb': rating_imdb,
         'director': director,
-        'description': description
+        'description': description,
+        'poster': poster_path,
     }
 
 

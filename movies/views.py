@@ -11,9 +11,6 @@ import time
 
 # Настройки для Selenium
 options = Options()
-options.headless = True  # Запуск браузера в фоновом режиме
-options.add_argument('--no-sandbox')  # Избегать проблем с песочницей
-options.add_argument('--disable-dev-shm-usage')  # Оптимизация использования памяти
 service = Service('geckodriver')
 
 
@@ -26,6 +23,8 @@ def load_movies(request):
             movie_data = parse_movie_details(movie_url)  # Парсим каждую страницу фильма
             movies_data.append(movie_data)
 
+        movies_data.sort(key = lambda x: x['rating_imdb'], reverse = True)
+
         # Очистка старых данных и запись новых в базу данных
         Movie.objects.all().delete()  # Удаляем старые данные перед загрузкой новых
 
@@ -36,6 +35,7 @@ def load_movies(request):
                 director=movie['director'],
                 imdb_rating=movie['rating_imdb'],
                 description=movie['description'],
+                poster=movie['poster'],
             )
 
         return redirect('movies_view')
