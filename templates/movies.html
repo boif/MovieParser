@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movies</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Movies</h1>
+    
+    <form method="post" action="{% url 'load_movies' %}">
+    {% csrf_token %}
+    <button type="submit">Load Movies</button>
+    </form>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Year</th>
+                <th>Director</th>
+                <th>IMDB Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for movie in movies %}
+            <tr>
+                <td>{{ movie.title }}</td>
+                <td>{{ movie.year }}</td>
+                <td>{{ movie.director }}</td>
+                <td>{{ movie.imdb_rating }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        $(document).ready(function() {
+            $('#load-movies-button').click(function() {
+                $.ajax({
+                    type: 'POST',
+                    url: "{% url 'load_movies' %}",
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'  // Передаем CSRF-токен
+                    },
+                    success: function(response) {
+                        // Очищаем таблицу
+                        $('#movies-table tbody').empty();
+                        
+                        // Заполняем таблицу новыми фильмами
+                        response.movies.forEach(function(movie) {
+                            $('#movies-table tbody').append('<tr><td>' + movie.title + '</td><td>' + movie.imdb_rating + '</td></tr>');
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error loading movies:', error);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
