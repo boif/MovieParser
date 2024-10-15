@@ -29,7 +29,7 @@ def parse_movie_details(movie_url):
         rating_imdb = 0.0  # Значение по умолчанию, если рейтинг отсутствует
 
     director = soup.select_one('.block_table:-soup-contains("режиссер") + div a').get_text(strip = True) if soup.select_one(
-        '.block_table:-soup-contains("режиссер") + div a') else 'Нет данных'
+        '.block_table:-soup-contains("режиссер") + div a') else None
     description = soup.select_one('.wrapper_movies_text').get_text(strip = True)
 
     poster_tag = soup.select_one('.wrapper_block_stack.wrapper_movies_poster')

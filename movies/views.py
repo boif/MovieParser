@@ -11,6 +11,9 @@ import time
 
 # Настройки для Selenium
 options = Options()
+options.add_argument("--headless")  # Включаем headless режим
+options.add_argument("--disable-gpu")  # Отключаем GPU для стабильности
+options.add_argument("--no-sandbox")
 service = Service('geckodriver')
 
 
@@ -51,7 +54,7 @@ def get_all_movie_urls():
 
         while len(movie_urls) < max_movies:
             driver.find_element(By.TAG_NAME, "body").send_keys(Keys.END)
-            time.sleep(0.5)
+            time.sleep(1)
             new_height = driver.execute_script("return document.body.scrollHeight")
 
             soup = BeautifulSoup(driver.page_source, 'lxml')
